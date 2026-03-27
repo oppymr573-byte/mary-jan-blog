@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mary Jan Blog - Live Version</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f0f2f5;
+      }
+      header {
+        background: linear-gradient(90deg, #4caf50, #3a9d3a);
+        color: white;
+        padding: 25px 20px;
+        text-align: center;
+        position: relative;
+      }
+      header h1 {
+        font-size: 2.5em;
+        margin: 0;
+        color: blue;
+      }
+      #creator {
+        position: absolute;
+        left: 10px;
+        top: 0px;
+        font-weight: bold;
+        color: red;
+        font-size: 1.1em;
+        font-family: arial;
+      }
+      nav {
+        display: flex;
+        justify-content: center;
+        background: #333;
+        flex-wrap: wrap;
+      }
+      nav a {
+        color: white;
+        padding: 12px 20px;
+        text-decoration: none;
+        transition: 0.3s;
+      }
+      nav a:hover {
+        background: #4caf50;
+        border-radius: 5px;
+      }
+      .container {
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+      }
+      .blog-post {
+        background: white;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+      .blog-post h2 {
+        color: #333;
+        margin-bottom: 12px;
+      }
+      #admin {
+        background: #e0f7e0;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+      }
+      #admin input,
+      #admin textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+      }
+      #admin button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        width: 100%;
+        font-size: 1.1em;
+      }
+      footer {
+        background: #333;
+        color: red;
+        text-align: center;
+        padding: 20px;
+        margin-top: 20px;
+      }
+      .ad {
+        background: #ddd;
+        padding: 15px;
+        text-align: center;
+        margin: 15px 0;
+        border-radius: 8px;
+        font-style: italic;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div id="creator">Created by Zeeshi</div>
+      <h1>Mary Jan Blog</h1>
+      <p>Share Your Story and Information...</p>
+    </header>
+
+    <nav>
+      <a href="#">Home</a>
+      <a href="#blog">Blog</a>
+      <a href="#admin">Admin</a>
+    </nav>
+
+    <div class="container" id="admin">
+      <h2>Add New Post (Online)</h2>
+      <input type="text" id="postTitle" placeholder="Enter Post Title" />
+      <textarea
+        id="postContent"
+        placeholder="Write your content here..."
+        rows="5"
+      ></textarea>
+      <button id="addPostBtn" type="button">Post to Blog</button>
+    </div>
+
+    <div class="container" id="blog">
+      <h2>Latest Posts</h2>
+      <div id="postsList">Loading posts from database...</div>
+    </div>
+
+<footer>
+  <p><b>&copy; 2026 Mary Jan Blog</b></p>
+  <div class="contact-info">
+    <p>📧 Email: <b>oppymr573@email.com</b></p>
+    
+    <p>
+      <a href="https://wa.me/923123456789" target="_blank" style="text-decoration: none; color: #25D366; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span>📲 WhatsApp Me:</span> <b>+923299038394</b>
+      </a>
+    </p>
+  </div>
+</footer>
+
+    <script type="module">
+      // 1. Firebase SDKs Import
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        onSnapshot,
+        query,
+        orderBy,
+      } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+      // 2. Sahi Configuration (Screenshot wali IDs)
+      const firebaseConfig = {
+        apiKey: "AIzaSyCG_Yls-cOtYEN9woJw2SlYU9X_EkoMLgo",
+        authDomain: "mary-jan-blog.firebaseapp.com",
+        projectId: "mary-jan-blog",
+        storageBucket: "mary-jan-blog.firebasestorage.app",
+        messagingSenderId: "129555394553",
+        appId: "1:129555394553:web:f44f33c3faf69e08f49728",
+        measurementId: "G-F9N4D0PL5C",
+      };
+
+      // 3. Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const postsCollection = collection(db, "posts");
+
+      // 4. ADD POST FUNCTION
+      const addBtn = document.getElementById("addPostBtn");
+      addBtn.addEventListener("click", async () => {
+        const title = document.getElementById("postTitle").value;
+        const content = document.getElementById("postContent").value;
+
+        if (title && content) {
+          try {
+            await addDoc(postsCollection, {
+              title: title,
+              content: content,
+              timestamp: new Date(),
+            });
+            document.getElementById("postTitle").value = "";
+            document.getElementById("postContent").value = "";
+            alert("Post added successfully!");
+          } catch (error) {
+            console.error("Firebase Error:", error);
+            alert("Error: " + error.message);
+          }
+        } else {
+          alert("Please enter both Title and Content");
+        }
+      });
+
+      // 5. RENDER POSTS (Real-time)
+      const q = query(postsCollection, orderBy("timestamp", "desc"));
+      onSnapshot(q, (snapshot) => {
+        const postsList = document.getElementById("postsList");
+        postsList.innerHTML = "";
+
+        if (snapshot.empty) {
+          postsList.innerHTML =
+            "<p>No posts found. Add your first post above!</p>";
+          return;
+        }
+
+        snapshot.forEach((doc) => {
+          const p = doc.data();
+          const div = document.createElement("div");
+          div.className = "blog-post";
+          div.innerHTML = `
+        <h2>${p.title}</h2>
+        <p>${p.content}</p>
+        <div class="ad">Advertisement Space</div>
+      `;
+          postsList.appendChild(div);
+        });
+      });
+    </script>
+  </body>
+</html>
